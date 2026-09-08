@@ -7,7 +7,7 @@
   <meta name="description" content="Chess AI — a polished browser chess game with four AI difficulty levels including Stockfish 18." />
   <title>Chess AI</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=3" />
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -166,6 +166,7 @@
         <label class="setting-line"><span>Thinking animation</span><input id="thinkingToggle" type="checkbox" checked /></label>
         <label class="setting-select"><span>Board theme</span><select id="boardThemeSelect"><option value="forest">Forest</option><option value="slate">Slate</option><option value="sand">Sand</option><option value="ocean">Ocean</option></select></label>
         <label class="setting-select"><span>Piece style</span><select id="pieceStyleSelect"><option value="filled">Filled</option><option value="traced">Traced</option></select></label>
+        <div class="build-version" aria-label="Application build version">Build 3.0</div>
       </div>
     </div>
   </div>
@@ -192,6 +193,6 @@
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=3"></script>
 </body>
 </html>

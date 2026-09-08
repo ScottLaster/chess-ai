@@ -1,9 +1,33 @@
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
 
 const $ = (id) => document.getElementById(id);
-const PIECE_GLYPHS = {
-  traced: { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕', k: '♔' },
-  filled: { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' },
+const PIECE_SVG = {
+  p: `
+    <circle class="piece-body" cx="50" cy="24" r="11" />
+    <path class="piece-body" d="M50 36 C39 36 34 46 37 57 L32 70 H68 L63 57 C66 46 61 36 50 36 Z" />
+    <path class="piece-body" d="M28 70 H72 L79 85 H21 Z" />`,
+  r: `
+    <path class="piece-body" d="M25 20 H37 V29 H45 V20 H55 V29 H63 V20 H75 V39 L68 45 L65 70 H35 L32 45 L25 39 Z" />
+    <path class="piece-body" d="M30 70 H70 L78 85 H22 Z" />`,
+  n: `
+    <path class="piece-body" d="M29 83 C31 67 35 57 43 49 L36 42 L49 18 L68 29 C74 34 78 43 77 51 L64 56 L60 70 H70 L77 84 Z" />
+    <path class="piece-detail" d="M49 19 L53 35 L39 42" />
+    <circle class="piece-detail-dot" cx="62" cy="38" r="2.8" />`,
+  b: `
+    <path class="piece-body" d="M50 16 C61 26 66 34 62 44 C59 51 56 55 58 61 L67 72 H33 L42 61 C44 55 41 51 38 44 C34 34 39 26 50 16 Z" />
+    <path class="piece-body" d="M29 72 H71 L79 85 H21 Z" />
+    <path class="piece-detail" d="M43 29 L57 42" />`,
+  q: `
+    <path class="piece-body" d="M25 30 L37 48 L50 27 L63 48 L75 30 L69 67 H31 Z" />
+    <path class="piece-body" d="M27 67 H73 L80 84 H20 Z" />
+    <circle class="piece-body" cx="24" cy="25" r="5" />
+    <circle class="piece-body" cx="50" cy="20" r="5" />
+    <circle class="piece-body" cx="76" cy="25" r="5" />
+    <path class="piece-detail" d="M34 56 H66" />`,
+  k: `
+    <path class="piece-body" d="M38 40 H62 C68 49 66 57 61 64 L68 72 H32 L39 64 C34 57 32 49 38 40 Z" />
+    <path class="piece-body" d="M28 72 H72 L79 85 H21 Z" />
+    <path class="piece-detail piece-cross" d="M50 13 V36 M39 24 H61" />`,
 };
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 const AI_LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard', impossible: 'Impossible' };
@@ -230,7 +254,7 @@ function renderBoard() {
     const piece = game.get(squareName);
     if (piece) {
       const el = document.createElement('div'); el.className = `piece piece-${piece.color === 'w' ? 'white':'black'}`;
-      el.textContent = pieceGlyph(piece.type);
+      el.innerHTML = pieceSvg(piece.type);
       el.draggable = false;
       el.setAttribute('aria-hidden','true');
       if (canHumanMovePiece(squareName)) el.addEventListener('pointerdown', e => onPiecePointerDown(e, squareName));
@@ -252,12 +276,18 @@ function canHumanMovePiece(square) {
   return !!p && p.color === playerColor && game.turn() === playerColor && !isAiThinking && !gameEnded;
 }
 
-function pieceGlyph(type) {
-  return PIECE_GLYPHS[settings.pieceStyle]?.[type] || PIECE_GLYPHS.filled[type];
+function pieceSvg(type) {
+  const shape = PIECE_SVG[type] || PIECE_SVG.p;
+  return `<svg class="piece-svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g>${shape}</g></svg>`;
 }
 
 function onPiecePointerDown(e, square) {
   if (!canHumanMovePiece(square) || e.button > 0) return;
+  e.preventDefault();
+  const board = $('board');
+  // Capture on the persistent board element rather than the piece. The piece DOM
+  // may be redrawn when legal moves are highlighted; board-level capture survives it.
+  try { board.setPointerCapture(e.pointerId); } catch {}
   pointerDrag = {
     pointerId: e.pointerId,
     source: square,
@@ -279,7 +309,7 @@ function onPiecePointerMove(e) {
     const piece = game.get(pointerDrag.source);
     dragGhost = document.createElement('div');
     dragGhost.className = `drag-ghost piece piece-${piece.color === 'w' ? 'white' : 'black'}`;
-    dragGhost.textContent = pieceGlyph(piece.type);
+    dragGhost.innerHTML = pieceSvg(piece.type);
     document.body.appendChild(dragGhost);
     document.body.classList.add('dragging-piece');
   }
@@ -292,16 +322,25 @@ function onPiecePointerUp(e) {
   if (!pointerDrag || e.pointerId !== pointerDrag.pointerId) return;
   const drag = pointerDrag;
   pointerDrag = null;
-  if (!drag.dragging) return;
+  const board = $('board');
+  if (!drag.dragging) {
+    try { if (board.hasPointerCapture(e.pointerId)) board.releasePointerCapture(e.pointerId); } catch {}
+    return;
+  }
   e.preventDefault();
   const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.square')?.dataset.square;
   cleanupDragGhost();
+  try { if (board.hasPointerCapture(e.pointerId)) board.releasePointerCapture(e.pointerId); } catch {}
   suppressClickUntil = performance.now() + 300;
   if (target) attemptHumanMove(drag.source, target);
   else renderBoard();
 }
 
-function cancelPointerDrag() {
+function cancelPointerDrag(e) {
+  const board = $('board');
+  if (pointerDrag && e?.pointerId === pointerDrag.pointerId) {
+    try { if (board.hasPointerCapture(e.pointerId)) board.releasePointerCapture(e.pointerId); } catch {}
+  }
   pointerDrag = null;
   cleanupDragGhost();
 }
@@ -343,7 +382,7 @@ function openPromotion(from, to) {
   const choices = $('promotionChoices'); choices.innerHTML='';
   ['q','r','b','n'].forEach(type => {
     const btn = document.createElement('button'); btn.type='button'; btn.className='promotion-choice';
-    btn.textContent = pieceGlyph(type); btn.setAttribute('aria-label', `Promote to ${pieceName(type)}`);
+    btn.innerHTML = pieceSvg(type); btn.classList.add(playerColor === 'w' ? 'piece-white' : 'piece-black'); btn.setAttribute('aria-label', `Promote to ${pieceName(type)}`);
     btn.addEventListener('click', () => { closeModal('promotionModal'); const p=pendingPromotion; pendingPromotion=null; commitMove({ ...p, promotion:type }); });
     choices.appendChild(btn);
   });
@@ -549,7 +588,7 @@ function idleYield() { return new Promise(resolve => setTimeout(resolve, 0)); }
 
 function ensureAiWorker() {
   if (aiWorker) return aiWorker;
-  aiWorker = new Worker('./ai-worker.js', { type: 'module' });
+  aiWorker = new Worker('./ai-worker.js?v=3', { type: 'module' });
   aiWorker.onmessage = (event) => {
     const { id, move, error, stats } = event.data || {};
     const pending = aiWorkerPending.get(id);
@@ -722,7 +761,7 @@ function renderCaptureRow(el, capturedTypes, capturer) {
   el.innerHTML='';
   const capturedColor=capturer==='w'?'b':'w';
   capturedTypes.sort((a,b)=>PIECE_VALUE[b]-PIECE_VALUE[a]);
-  capturedTypes.forEach(t=>{ const s=document.createElement('span'); s.className=`captured-piece piece-${capturedColor === 'w' ? 'white' : 'black'}`; s.textContent=pieceGlyph(t); el.appendChild(s); });
+  capturedTypes.forEach(t=>{ const s=document.createElement('span'); s.className=`captured-piece piece-${capturedColor === 'w' ? 'white' : 'black'}`; s.innerHTML=pieceSvg(t); el.appendChild(s); });
   const material=materialDelta(capturer);
   if(material>0){ const score=document.createElement('span'); score.className='capture-score'; score.textContent=`+${material}`; el.appendChild(score); }
 }

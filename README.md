@@ -1,4 +1,4 @@
-# Chess AI
+# Chess AI — Build 3.0
 
 A deployable, responsive browser chess game with four AI levels and a Stockfish 18 WASM-powered **Impossible** mode.
 
@@ -65,8 +65,15 @@ For a production deployment where you want zero CDN dependency, download those f
 
 The setup screen intentionally shows only the difficulty names. Internal tuning targets are approximately 250 / 525 / 850 for Easy / Medium / Hard, but these are heuristic strength targets rather than scientifically calibrated Elo ratings. Impossible is intentionally different: it uses a real Stockfish engine.
 
-Piece appearance can be switched between Filled and Traced in Settings. Piece movement supports direct pointer dragging across mouse, touch, pen, and trackpad-capable browsers, with click-to-move retained as an accessibility fallback.
+Piece appearance can be switched between Filled and Traced in Settings. Build 3.0 uses inline vector pieces so White and Black colors remain deterministic across browsers. Piece movement uses board-level pointer capture for reliable dragging across desktop mouse/trackpad, touch, and pen, with click-to-move retained as an accessibility fallback.
 
 ## License / third-party software
 
 This original app code may be used and modified by the project owner. Third-party dependencies retain their own licenses: chess.js is BSD-2-Clause; Stockfish/Stockfish.js is GPL-3.0. Review the dependency licenses before public redistribution, especially if you choose to self-host the Stockfish engine files.
+
+
+## Build 3.0 fixes
+
+- Replaced Unicode filled pieces with deterministic inline SVG pieces so White pieces cannot render as black due to platform glyph/emoji behavior.
+- Fixed desktop drag-and-drop by capturing the pointer on the persistent board element before board redraws.
+- Added cache-busting version parameters for app assets and a visible **Build 3.0** marker in Settings to make GitHub Pages deployment verification easier.
