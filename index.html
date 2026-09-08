@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#161817" />
+  <meta name="description" content="Chess AI — a polished browser chess game with four AI difficulty levels including Stockfish 18." />
+  <title>Chess AI</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Chess AI home">
+        <div class="brand-mark" aria-hidden="true">♞</div>
+        <div>
+          <div class="brand-title">Chess AI</div>
+          <div class="brand-subtitle">You vs. AI</div>
+        </div>
+      </div>
+      <button id="settingsButton" class="icon-button" type="button" aria-label="Open settings" title="Settings">⚙</button>
+    </header>
+
+    <main>
+      <section id="setupScreen" class="setup-screen" aria-labelledby="setupTitle">
+        <div class="setup-card">
+          <div class="eyebrow">PLAY COMPUTER</div>
+          <h1 id="setupTitle">Choose your game</h1>
+          <p class="setup-intro">Pick a side, choose the opponent strength, and start immediately.</p>
+
+          <fieldset class="setup-group">
+            <legend>My Color</legend>
+            <div class="segmented-grid three">
+              <button class="choice-button selected" type="button" data-color="w" aria-pressed="true">
+                <span class="choice-piece light-piece">♙</span>
+                <span>White</span>
+              </button>
+              <button class="choice-button" type="button" data-color="b" aria-pressed="false">
+                <span class="choice-piece dark-piece">♟</span>
+                <span>Black</span>
+              </button>
+              <button class="choice-button" type="button" data-color="random" aria-pressed="false">
+                <span class="choice-piece">◐</span>
+                <span>Random</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="setup-group">
+            <legend>Difficulty</legend>
+            <div class="difficulty-grid">
+              <button class="difficulty-card" type="button" data-difficulty="easy" aria-pressed="false">
+                <span class="difficulty-name">Easy</span>
+                <span class="difficulty-elo">~100 Elo</span>
+                <span class="difficulty-desc">Beginner mistakes, missed tactics</span>
+              </button>
+              <button class="difficulty-card selected" type="button" data-difficulty="medium" aria-pressed="true">
+                <span class="difficulty-name">Medium</span>
+                <span class="difficulty-elo">~375 Elo</span>
+                <span class="difficulty-desc">Basic tactics, inconsistent defense</span>
+              </button>
+              <button class="difficulty-card" type="button" data-difficulty="hard" aria-pressed="false">
+                <span class="difficulty-name">Hard</span>
+                <span class="difficulty-elo">~700 Elo</span>
+                <span class="difficulty-desc">Deeper search, tactical awareness</span>
+              </button>
+              <button class="difficulty-card impossible" type="button" data-difficulty="impossible" aria-pressed="false">
+                <span class="difficulty-name">Impossible</span>
+                <span class="difficulty-elo">Extremely Strong</span>
+                <span class="difficulty-desc">Stockfish 18 WASM engine</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <div class="setup-row">
+            <label class="clock-setup" for="clockSetupToggle">
+              <span>
+                <strong>10:00 chess clock</strong>
+                <small>Disable for untimed play</small>
+              </span>
+              <span class="switch">
+                <input id="clockSetupToggle" type="checkbox" checked />
+                <span class="slider" aria-hidden="true"></span>
+              </span>
+            </label>
+          </div>
+
+          <button id="startGameButton" class="primary-button start-button" type="button">Start Game</button>
+          <p class="elo-note">Difficulty ratings are approximate play-strength targets, not calibrated competitive ratings.</p>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="game-screen hidden" aria-label="Chess game">
+        <div class="game-layout">
+          <section class="board-column">
+            <div id="opponentStrip" class="player-strip opponent-strip">
+              <div class="avatar ai-avatar" aria-hidden="true">♞</div>
+              <div class="player-meta">
+                <div class="player-name-row"><strong>Chess AI</strong><span id="aiDifficultyBadge" class="badge">Medium</span></div>
+                <div id="aiCaptured" class="captured-row" aria-label="Pieces captured by AI"></div>
+              </div>
+              <div id="aiClock" class="clock" aria-label="AI clock">10:00</div>
+            </div>
+
+            <div id="boardWrap" class="board-wrap">
+              <div id="board" class="chessboard" role="grid" aria-label="Chess board"></div>
+              <div id="thinkingOverlay" class="thinking-overlay hidden" aria-live="polite">
+                <span class="thinking-dot"></span><span>AI is thinking…</span>
+              </div>
+            </div>
+
+            <div id="playerStrip" class="player-strip player-strip-self">
+              <div class="avatar player-avatar" aria-hidden="true">●</div>
+              <div class="player-meta">
+                <div class="player-name-row"><strong>You</strong><span id="playerColorBadge" class="badge muted">White</span></div>
+                <div id="playerCaptured" class="captured-row" aria-label="Pieces captured by player"></div>
+              </div>
+              <div id="playerClock" class="clock active" aria-label="Player clock">10:00</div>
+            </div>
+          </section>
+
+          <aside class="side-panel" aria-label="Game information and controls">
+            <div class="panel-section engine-panel">
+              <div class="panel-heading-row">
+                <h2>Game</h2>
+                <span id="turnStatus" class="turn-status">Your turn</span>
+              </div>
+              <div class="engine-info-grid">
+                <div><span class="label">AI Difficulty</span><strong id="aiDifficultyText">Medium</strong></div>
+                <div><span class="label">AI Status</span><strong id="aiStatusText">Ready</strong></div>
+                <div><span class="label">Evaluation</span><strong id="evaluationText">—</strong></div>
+                <div><span class="label">Depth</span><strong id="depthText">—</strong></div>
+              </div>
+            </div>
+
+            <div class="panel-section move-section">
+              <div class="panel-heading-row">
+                <h2>Moves</h2>
+                <span id="moveCount" class="tiny-label">0 moves</span>
+              </div>
+              <div id="moveList" class="move-list" aria-live="polite"></div>
+            </div>
+
+            <div class="panel-section material-section">
+              <div class="material-row"><span>Material</span><strong id="materialAdvantage">Equal</strong></div>
+            </div>
+
+            <div class="panel-section control-section">
+              <div class="control-grid">
+                <button id="undoButton" class="secondary-button" type="button">↶ Undo</button>
+                <button id="restartButton" class="secondary-button" type="button">↻ Restart</button>
+                <button id="resignButton" class="danger-button" type="button">Resign</button>
+                <button id="newGameButton" class="secondary-button" type="button">New Game</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-card settings-card">
+      <div class="modal-header">
+        <div><div class="eyebrow">PREFERENCES</div><h2 id="settingsTitle">Settings</h2></div>
+        <button class="icon-button close-modal" type="button" data-close="settingsModal" aria-label="Close settings">×</button>
+      </div>
+      <div class="settings-list">
+        <label class="setting-line"><span>Sound effects</span><input id="soundToggle" type="checkbox" /></label>
+        <label class="setting-line"><span>Move animations</span><input id="animationToggle" type="checkbox" checked /></label>
+        <label class="setting-line"><span>Coordinates</span><input id="coordinatesToggle" type="checkbox" checked /></label>
+        <label class="setting-line"><span>Legal move highlights</span><input id="legalMovesToggle" type="checkbox" checked /></label>
+        <label class="setting-line"><span>Chess clock</span><input id="clockToggle" type="checkbox" checked /></label>
+        <label class="setting-line"><span>Thinking animation</span><input id="thinkingToggle" type="checkbox" checked /></label>
+        <label class="setting-select"><span>Board theme</span><select id="boardThemeSelect"><option value="forest">Forest</option><option value="slate">Slate</option><option value="sand">Sand</option><option value="ocean">Ocean</option></select></label>
+        <label class="setting-select"><span>Piece style</span><select id="pieceStyleSelect"><option value="classic">Classic</option><option value="modern">Modern</option><option value="minimal">Minimal</option></select></label>
+      </div>
+    </div>
+  </div>
+
+  <div id="promotionModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="promotionTitle">
+    <div class="modal-card promotion-card">
+      <h2 id="promotionTitle">Promote pawn</h2>
+      <div id="promotionChoices" class="promotion-choices"></div>
+    </div>
+  </div>
+
+  <div id="resultModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="modal-card result-card">
+      <div id="resultKicker" class="eyebrow">GAME OVER</div>
+      <h2 id="resultTitle">Checkmate</h2>
+      <p id="resultMessage">You win!</p>
+      <div class="result-actions">
+        <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
+        <button id="changeDifficultyButton" class="secondary-button" type="button">Change Difficulty</button>
+        <button id="returnSetupButton" class="secondary-button" type="button">Return to Setup</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
