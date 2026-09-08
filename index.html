@@ -52,23 +52,15 @@
             <div class="difficulty-grid">
               <button class="difficulty-card" type="button" data-difficulty="easy" aria-pressed="false">
                 <span class="difficulty-name">Easy</span>
-                <span class="difficulty-elo">~100 Elo</span>
-                <span class="difficulty-desc">Beginner mistakes, missed tactics</span>
               </button>
               <button class="difficulty-card selected" type="button" data-difficulty="medium" aria-pressed="true">
                 <span class="difficulty-name">Medium</span>
-                <span class="difficulty-elo">~375 Elo</span>
-                <span class="difficulty-desc">Basic tactics, inconsistent defense</span>
               </button>
               <button class="difficulty-card" type="button" data-difficulty="hard" aria-pressed="false">
                 <span class="difficulty-name">Hard</span>
-                <span class="difficulty-elo">~700 Elo</span>
-                <span class="difficulty-desc">Deeper search, tactical awareness</span>
               </button>
               <button class="difficulty-card impossible" type="button" data-difficulty="impossible" aria-pressed="false">
                 <span class="difficulty-name">Impossible</span>
-                <span class="difficulty-elo">Extremely Strong</span>
-                <span class="difficulty-desc">Stockfish 18 WASM engine</span>
               </button>
             </div>
           </fieldset>
@@ -87,7 +79,6 @@
           </div>
 
           <button id="startGameButton" class="primary-button start-button" type="button">Start Game</button>
-          <p class="elo-note">Difficulty ratings are approximate play-strength targets, not calibrated competitive ratings.</p>
         </div>
       </section>
 
@@ -174,7 +165,7 @@
         <label class="setting-line"><span>Chess clock</span><input id="clockToggle" type="checkbox" checked /></label>
         <label class="setting-line"><span>Thinking animation</span><input id="thinkingToggle" type="checkbox" checked /></label>
         <label class="setting-select"><span>Board theme</span><select id="boardThemeSelect"><option value="forest">Forest</option><option value="slate">Slate</option><option value="sand">Sand</option><option value="ocean">Ocean</option></select></label>
-        <label class="setting-select"><span>Piece style</span><select id="pieceStyleSelect"><option value="classic">Classic</option><option value="modern">Modern</option><option value="minimal">Minimal</option></select></label>
+        <label class="setting-select"><span>Piece style</span><select id="pieceStyleSelect"><option value="filled">Filled</option><option value="traced">Traced</option></select></label>
       </div>
     </div>
   </div>

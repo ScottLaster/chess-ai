@@ -15,8 +15,8 @@ self.onmessage = (event) => {
     if (opening) return self.postMessage({ id, move: toMoveInput(opening), stats: { nodes: 0, depth: 0 } });
 
     const config = level === 'medium'
-      ? { depth: 2, timeMs: 260, noise: 160 }
-      : { depth: 3, timeMs: 760, noise: 42 };
+      ? { depth: 2, timeMs: 430, noise: 100 }
+      : { depth: 3, timeMs: 1200, noise: 20 };
     const result = searchBestMove(game, aiColor, config.depth, config.timeMs, config.noise);
     self.postMessage({ id, move: result.move || toMoveInput(moves[0]), stats: { nodes: result.nodes, depth: config.depth } });
   } catch (error) {
@@ -37,10 +37,10 @@ function chooseOpeningMove(game, moves, level, plyCount) {
     if (w > 0) weighted.push({ m, w });
   });
   if (!weighted.length) return null;
-  const probability = level === 'medium' ? .82 : .94;
+  const probability = level === 'medium' ? .90 : .98;
   if (Math.random() > probability) return null;
   weighted.sort((a,b) => b.w - a.w);
-  const pool = level === 'hard' ? weighted.slice(0,3) : weighted.slice(0,5);
+  const pool = level === 'hard' ? weighted.slice(0,2) : weighted.slice(0,3);
   return pool[Math.floor(Math.random() * pool.length)].m;
 }
 

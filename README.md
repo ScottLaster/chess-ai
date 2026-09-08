@@ -7,9 +7,9 @@ A deployable, responsive browser chess game with four AI levels and a Stockfish 
 - Complete legal chess rules via `chess.js` 1.4.0: check/checkmate, stalemate, castling, en passant, promotion, 50-move draw, threefold repetition, insufficient material, and illegal-move prevention.
 - White / Black / Random side selection.
 - Four AI levels (Medium and Hard calculate in a dedicated Web Worker so the board stays responsive):
-  - Easy — approximate ~100 Elo experience via noisy one-ply move scoring and deliberate errors.
-  - Medium — approximate ~375 Elo experience via shallow alpha-beta search plus noise.
-  - Hard — approximate ~700 Elo experience via deeper alpha-beta search, move ordering, positional evaluation, and lower randomness.
+  - Easy — stronger beginner tuning with improved one-ply move selection while retaining deliberate errors.
+  - Medium — stronger shallow alpha-beta search with less evaluation noise.
+  - Hard — stronger deeper alpha-beta search with more calculation time and substantially less randomness.
   - Impossible — Stockfish 18 lite single-threaded WASM, loaded in a Web Worker and searched by time.
 - Click-to-move and drag-and-drop.
 - Legal-move, capture, last-move, selection, and check highlights.
@@ -63,7 +63,9 @@ For a production deployment where you want zero CDN dependency, download those f
 
 ## Notes on difficulty
 
-The displayed Elo values for Easy/Medium/Hard are UX targets, not scientifically calibrated ratings. Impossible is intentionally different: it uses a real Stockfish engine rather than a simulated Elo heuristic.
+The setup screen intentionally shows only the difficulty names. Internal tuning targets are approximately 250 / 525 / 850 for Easy / Medium / Hard, but these are heuristic strength targets rather than scientifically calibrated Elo ratings. Impossible is intentionally different: it uses a real Stockfish engine.
+
+Piece appearance can be switched between Filled and Traced in Settings. Piece movement supports direct pointer dragging across mouse, touch, pen, and trackpad-capable browsers, with click-to-move retained as an accessibility fallback.
 
 ## License / third-party software
 

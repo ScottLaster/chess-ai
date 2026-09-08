@@ -1,9 +1,9 @@
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
 
 const $ = (id) => document.getElementById(id);
-const PIECES = {
-  w: { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕', k: '♔' },
-  b: { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' },
+const PIECE_GLYPHS = {
+  traced: { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕', k: '♔' },
+  filled: { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' },
 };
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 const AI_LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard', impossible: 'Impossible' };
@@ -35,6 +35,9 @@ let gameStartSnapshot = null;
 let gameGeneration = 0;
 let aiWorker = null;
 let aiWorkerSeq = 0;
+let pointerDrag = null;
+let dragGhost = null;
+let suppressClickUntil = 0;
 const aiWorkerPending = new Map();
 
 const defaultSettings = {
@@ -45,13 +48,15 @@ const defaultSettings = {
   clock: true,
   thinking: true,
   boardTheme: 'forest',
-  pieceStyle: 'classic',
+  pieceStyle: 'filled',
 };
 let settings = loadSettings();
 
 function loadSettings() {
   try {
-    return { ...defaultSettings, ...JSON.parse(localStorage.getItem('chess-ai-settings') || '{}') };
+    const loaded = { ...defaultSettings, ...JSON.parse(localStorage.getItem('chess-ai-settings') || '{}') };
+    if (!['filled','traced'].includes(loaded.pieceStyle)) loaded.pieceStyle = 'filled';
+    return loaded;
   } catch {
     return { ...defaultSettings };
   }
@@ -68,6 +73,9 @@ function init() {
   renderBoard();
   updateAllUi();
   document.addEventListener('keydown', handleKeyboard);
+  document.addEventListener('pointermove', onPiecePointerMove, { passive: false });
+  document.addEventListener('pointerup', onPiecePointerUp, { passive: false });
+  document.addEventListener('pointercancel', cancelPointerDrag);
 }
 
 function bindSetup() {
@@ -131,9 +139,10 @@ function bindSettings() {
 function applySettings() {
   document.body.dataset.boardTheme = settings.boardTheme;
   document.body.classList.toggle('animations-on', settings.animations);
-  document.body.classList.remove('piece-style-classic','piece-style-modern','piece-style-minimal');
+  document.body.classList.remove('piece-style-filled','piece-style-traced','piece-style-classic','piece-style-modern','piece-style-minimal');
   document.body.classList.add(`piece-style-${settings.pieceStyle}`);
   if ($('board').children.length) renderBoard();
+  updateCaptured();
   updateThinkingIndicator();
 }
 
@@ -208,6 +217,7 @@ function renderBoard() {
     square.dataset.square = squareName; square.setAttribute('role','gridcell'); square.setAttribute('tabindex','0');
     square.setAttribute('aria-label', describeSquare(squareName));
     if (selectedSquare === squareName) square.classList.add('selected');
+    if (pointerDrag?.dragging && pointerDrag.source === squareName) square.classList.add('drag-source');
     if (lastMove && (lastMove.from === squareName || lastMove.to === squareName)) square.classList.add('last-move');
     if (checkedKing === squareName) square.classList.add('in-check');
     if (settings.legalMoves && legalTargets.has(squareName)) {
@@ -220,15 +230,13 @@ function renderBoard() {
     const piece = game.get(squareName);
     if (piece) {
       const el = document.createElement('div'); el.className = `piece piece-${piece.color === 'w' ? 'white':'black'}`;
-      el.textContent = PIECES[piece.color][piece.type]; el.draggable = canHumanMovePiece(squareName);
+      el.textContent = pieceGlyph(piece.type);
+      el.draggable = false;
       el.setAttribute('aria-hidden','true');
-      el.addEventListener('dragstart', e => onDragStart(e, squareName));
-      el.addEventListener('dragend', () => document.body.classList.remove('dragging-piece'));
+      if (canHumanMovePiece(squareName)) el.addEventListener('pointerdown', e => onPiecePointerDown(e, squareName));
       square.appendChild(el);
     }
-    square.addEventListener('click', () => onSquareClick(squareName));
-    square.addEventListener('dragover', e => e.preventDefault());
-    square.addEventListener('drop', e => onDrop(e, squareName));
+    square.addEventListener('click', () => { if (performance.now() >= suppressClickUntil) onSquareClick(squareName); });
     square.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSquareClick(squareName); } });
     board.appendChild(square);
   }));
@@ -244,17 +252,64 @@ function canHumanMovePiece(square) {
   return !!p && p.color === playerColor && game.turn() === playerColor && !isAiThinking && !gameEnded;
 }
 
-function onDragStart(e, square) {
-  if (!canHumanMovePiece(square)) { e.preventDefault(); return; }
-  selectSquare(square);
-  e.dataTransfer.setData('text/plain', square);
-  e.dataTransfer.effectAllowed = 'move';
-  document.body.classList.add('dragging-piece');
+function pieceGlyph(type) {
+  return PIECE_GLYPHS[settings.pieceStyle]?.[type] || PIECE_GLYPHS.filled[type];
 }
-function onDrop(e, target) {
+
+function onPiecePointerDown(e, square) {
+  if (!canHumanMovePiece(square) || e.button > 0) return;
+  pointerDrag = {
+    pointerId: e.pointerId,
+    source: square,
+    startX: e.clientX,
+    startY: e.clientY,
+    dragging: false,
+  };
+}
+
+function onPiecePointerMove(e) {
+  if (!pointerDrag || e.pointerId !== pointerDrag.pointerId) return;
+  const distance = Math.hypot(e.clientX - pointerDrag.startX, e.clientY - pointerDrag.startY);
+  if (!pointerDrag.dragging && distance < 6) return;
+  if (!pointerDrag.dragging) {
+    pointerDrag.dragging = true;
+    selectedSquare = pointerDrag.source;
+    legalMoves = game.moves({ square: pointerDrag.source, verbose: true });
+    renderBoard();
+    const piece = game.get(pointerDrag.source);
+    dragGhost = document.createElement('div');
+    dragGhost.className = `drag-ghost piece piece-${piece.color === 'w' ? 'white' : 'black'}`;
+    dragGhost.textContent = pieceGlyph(piece.type);
+    document.body.appendChild(dragGhost);
+    document.body.classList.add('dragging-piece');
+  }
   e.preventDefault();
-  const source = e.dataTransfer.getData('text/plain') || selectedSquare;
-  if (source) attemptHumanMove(source, target);
+  dragGhost.style.left = `${e.clientX}px`;
+  dragGhost.style.top = `${e.clientY}px`;
+}
+
+function onPiecePointerUp(e) {
+  if (!pointerDrag || e.pointerId !== pointerDrag.pointerId) return;
+  const drag = pointerDrag;
+  pointerDrag = null;
+  if (!drag.dragging) return;
+  e.preventDefault();
+  const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.square')?.dataset.square;
+  cleanupDragGhost();
+  suppressClickUntil = performance.now() + 300;
+  if (target) attemptHumanMove(drag.source, target);
+  else renderBoard();
+}
+
+function cancelPointerDrag() {
+  pointerDrag = null;
+  cleanupDragGhost();
+}
+
+function cleanupDragGhost() {
+  dragGhost?.remove();
+  dragGhost = null;
+  document.body.classList.remove('dragging-piece');
 }
 
 function onSquareClick(square) {
@@ -288,7 +343,7 @@ function openPromotion(from, to) {
   const choices = $('promotionChoices'); choices.innerHTML='';
   ['q','r','b','n'].forEach(type => {
     const btn = document.createElement('button'); btn.type='button'; btn.className='promotion-choice';
-    btn.textContent = PIECES[playerColor][type]; btn.setAttribute('aria-label', `Promote to ${pieceName(type)}`);
+    btn.textContent = pieceGlyph(type); btn.setAttribute('aria-label', `Promote to ${pieceName(type)}`);
     btn.addEventListener('click', () => { closeModal('promotionModal'); const p=pendingPromotion; pendingPromotion=null; commitMove({ ...p, promotion:type }); });
     choices.appendChild(btn);
   });
@@ -365,11 +420,12 @@ async function chooseCustomAiMove(level) {
   if (opening) return toMoveInput(opening);
 
   if (level === 'easy') {
-    const scored = moves.map(m => ({ m, s: scoreMoveOnePly(m, aiColor) + randomNormalish()*420 }));
+    const scored = moves.map(m => ({ m, s: scoreMoveOnePly(m, aiColor) + randomNormalish()*230 }));
     scored.sort((a,b)=>b.s-a.s);
-    // Beginner: often selects from the middle/lower half, but still sees obvious captures sometimes.
+    // Stronger beginner: favors good one-ply moves more often, while retaining meaningful mistakes.
     const r = Math.random();
-    const idx = r < .18 ? 0 : r < .55 ? Math.min(scored.length-1, 2+Math.floor(Math.random()*Math.min(8,scored.length))) : Math.floor(Math.random()*scored.length);
+    const nearBestPool = Math.min(5, scored.length);
+    const idx = r < .38 ? 0 : r < .82 ? Math.floor(Math.random()*nearBestPool) : Math.floor(Math.random()*scored.length);
     await idleYield();
     return toMoveInput(scored[idx].m);
   }
@@ -378,7 +434,7 @@ async function chooseCustomAiMove(level) {
       return await getWorkerAiMove(level);
     } catch (err) {
       console.warn('AI worker fallback', err);
-      const config = level === 'medium' ? [2, 220, 160] : [3, 520, 45];
+      const config = level === 'medium' ? [2, 360, 100] : [3, 900, 20];
       const search = searchBestMove(...config);
       await idleYield();
       return search.move || toMoveInput(moves[0]);
@@ -400,10 +456,10 @@ function chooseOpeningMove(moves, level) {
     if (w>0) weighted.push({m,w});
   });
   if (!weighted.length) return null;
-  const probability = level==='easy' ? .62 : level==='medium' ? .82 : .94;
+  const probability = level==='easy' ? .74 : level==='medium' ? .90 : .98;
   if (Math.random()>probability) return null;
   weighted.sort((a,b)=>b.w-a.w);
-  const pool = level==='hard' ? weighted.slice(0,3) : weighted.slice(0,5);
+  const pool = level==='hard' ? weighted.slice(0,2) : level==='medium' ? weighted.slice(0,3) : weighted.slice(0,4);
   return pool[Math.floor(Math.random()*pool.length)].m;
 }
 
@@ -523,7 +579,7 @@ function getWorkerAiMove(level) {
       if (!pending) return;
       aiWorkerPending.delete(id);
       pending.reject(new Error('AI worker timeout'));
-    }, level === 'hard' ? 2500 : 1600);
+    }, level === 'hard' ? 3500 : 2200);
   });
 }
 function resetAiWorker() {
@@ -666,7 +722,7 @@ function renderCaptureRow(el, capturedTypes, capturer) {
   el.innerHTML='';
   const capturedColor=capturer==='w'?'b':'w';
   capturedTypes.sort((a,b)=>PIECE_VALUE[b]-PIECE_VALUE[a]);
-  capturedTypes.forEach(t=>{ const s=document.createElement('span'); s.className='captured-piece'; s.textContent=PIECES[capturedColor][t]; el.appendChild(s); });
+  capturedTypes.forEach(t=>{ const s=document.createElement('span'); s.className=`captured-piece piece-${capturedColor === 'w' ? 'white' : 'black'}`; s.textContent=pieceGlyph(t); el.appendChild(s); });
   const material=materialDelta(capturer);
   if(material>0){ const score=document.createElement('span'); score.className='capture-score'; score.textContent=`+${material}`; el.appendChild(score); }
 }
