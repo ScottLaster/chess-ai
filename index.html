@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#161817" />
-  <meta name="description" content="Chess AI — a polished browser chess game with four AI difficulty levels including Stockfish 18." />
+  <meta name="description" content="Chess AI — a polished browser chess game with four AI difficulty levels and coach-led game review." />
   <title>Chess AI</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="./styles.css?v=3" />
+  <link rel="stylesheet" href="./styles.css?v=4" />
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -33,15 +33,15 @@
             <legend>My Color</legend>
             <div class="segmented-grid three">
               <button class="choice-button selected" type="button" data-color="w" aria-pressed="true">
-                <span class="choice-piece light-piece">♙</span>
+                <span class="choice-piece choice-piece-icon" data-choice-piece="white"></span>
                 <span>White</span>
               </button>
               <button class="choice-button" type="button" data-color="b" aria-pressed="false">
-                <span class="choice-piece dark-piece">♟</span>
+                <span class="choice-piece choice-piece-icon" data-choice-piece="black"></span>
                 <span>Black</span>
               </button>
               <button class="choice-button" type="button" data-color="random" aria-pressed="false">
-                <span class="choice-piece">◐</span>
+                <span class="choice-piece choice-piece-icon" data-choice-piece="random"></span>
                 <span>Random</span>
               </button>
             </div>
@@ -51,15 +51,19 @@
             <legend>Difficulty</legend>
             <div class="difficulty-grid">
               <button class="difficulty-card" type="button" data-difficulty="easy" aria-pressed="false">
+                <span class="difficulty-avatar" data-difficulty-avatar="easy" aria-hidden="true"></span>
                 <span class="difficulty-name">Easy</span>
               </button>
               <button class="difficulty-card selected" type="button" data-difficulty="medium" aria-pressed="true">
+                <span class="difficulty-avatar" data-difficulty-avatar="medium" aria-hidden="true"></span>
                 <span class="difficulty-name">Medium</span>
               </button>
               <button class="difficulty-card" type="button" data-difficulty="hard" aria-pressed="false">
+                <span class="difficulty-avatar" data-difficulty-avatar="hard" aria-hidden="true"></span>
                 <span class="difficulty-name">Hard</span>
               </button>
               <button class="difficulty-card impossible" type="button" data-difficulty="impossible" aria-pressed="false">
+                <span class="difficulty-avatar" data-difficulty-avatar="impossible" aria-hidden="true"></span>
                 <span class="difficulty-name">Impossible</span>
               </button>
             </div>
@@ -86,9 +90,9 @@
         <div class="game-layout">
           <section class="board-column">
             <div id="opponentStrip" class="player-strip opponent-strip">
-              <div class="avatar ai-avatar" aria-hidden="true">♞</div>
+              <div id="aiAvatar" class="avatar blob-avatar ai-avatar" aria-hidden="true"></div>
               <div class="player-meta">
-                <div class="player-name-row"><strong>Chess AI</strong><span id="aiDifficultyBadge" class="badge">Medium</span></div>
+                <div class="player-name-row"><strong id="aiNameText">Bellow</strong><span id="aiDifficultyBadge" class="badge">Medium</span></div>
                 <div id="aiCaptured" class="captured-row" aria-label="Pieces captured by AI"></div>
               </div>
               <div id="aiClock" class="clock" aria-label="AI clock">10:00</div>
@@ -102,7 +106,7 @@
             </div>
 
             <div id="playerStrip" class="player-strip player-strip-self">
-              <div class="avatar player-avatar" aria-hidden="true">●</div>
+              <div id="playerAvatar" class="avatar player-avatar" aria-hidden="true">●</div>
               <div class="player-meta">
                 <div class="player-name-row"><strong>You</strong><span id="playerColorBadge" class="badge muted">White</span></div>
                 <div id="playerCaptured" class="captured-row" aria-label="Pieces captured by player"></div>
@@ -120,8 +124,8 @@
               <div class="engine-info-grid">
                 <div><span class="label">AI Difficulty</span><strong id="aiDifficultyText">Medium</strong></div>
                 <div><span class="label">AI Status</span><strong id="aiStatusText">Ready</strong></div>
-                <div><span class="label">Evaluation</span><strong id="evaluationText">—</strong></div>
-                <div><span class="label">Depth</span><strong id="depthText">—</strong></div>
+                <div><span class="label">Position</span><strong id="evaluationText">Equal (0.0)</strong></div>
+                <div><span class="label">Key Idea</span><strong id="depthText">Develop pieces</strong></div>
               </div>
             </div>
 
@@ -166,7 +170,7 @@
         <label class="setting-line"><span>Thinking animation</span><input id="thinkingToggle" type="checkbox" checked /></label>
         <label class="setting-select"><span>Board theme</span><select id="boardThemeSelect"><option value="forest">Forest</option><option value="slate">Slate</option><option value="sand">Sand</option><option value="ocean">Ocean</option></select></label>
         <label class="setting-select"><span>Piece style</span><select id="pieceStyleSelect"><option value="filled">Filled</option><option value="traced">Traced</option></select></label>
-        <div class="build-version" aria-label="Application build version">Build 3.0</div>
+        <div class="build-version" aria-label="Application build version">Build 4.0</div>
       </div>
     </div>
   </div>
@@ -184,15 +188,53 @@
       <h2 id="resultTitle">Checkmate</h2>
       <p id="resultMessage">You win!</p>
       <div class="result-actions">
-        <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
+        <button id="reviewGameButton" class="primary-button" type="button">Game Review</button>
+        <button id="playAgainButton" class="secondary-button" type="button">Play Again</button>
         <button id="changeDifficultyButton" class="secondary-button" type="button">Change Difficulty</button>
         <button id="returnSetupButton" class="secondary-button" type="button">Return to Setup</button>
       </div>
     </div>
   </div>
 
+  <div id="reviewModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
+    <div class="modal-card review-card">
+      <div class="modal-header">
+        <div><div class="eyebrow">COACH REVIEW</div><h2 id="reviewTitle">Blurple's Review</h2></div>
+        <button class="icon-button close-modal" type="button" data-close="reviewModal" aria-label="Close review">×</button>
+      </div>
+      <div class="coach-intro">
+        <div id="coachAvatar" class="avatar blob-avatar coach-avatar" aria-hidden="true"></div>
+        <div class="coach-bubble">
+          <strong id="coachHeadline">Let’s review your game.</strong>
+          <p id="coachSummary">I’ll look at your decisions, highlight your best moments, and point out the biggest improvement areas.</p>
+        </div>
+      </div>
+      <div id="reviewLoading" class="review-loading hidden">Analyzing game…</div>
+      <div id="reviewContent" class="review-content">
+        <div class="review-summary-grid">
+          <div class="review-stat-card"><span class="label">Estimated Game Rating</span><strong id="reviewPlayerRating">—</strong><small>You</small></div>
+          <div class="review-stat-card"><span class="label">Accuracy</span><strong id="reviewPlayerAccuracy">—</strong><small>Your moves</small></div>
+          <div class="review-stat-card"><span class="label">AI Game Rating</span><strong id="reviewAiRating">—</strong><small id="reviewAiName">Opponent</small></div>
+          <div class="review-stat-card"><span class="label">AI Accuracy</span><strong id="reviewAiAccuracy">—</strong><small>Opponent moves</small></div>
+        </div>
+        <div class="review-section-block">
+          <h3>Your move quality</h3>
+          <div id="reviewCounts" class="review-count-grid"></div>
+        </div>
+        <div class="review-section-block">
+          <h3>Key moments</h3>
+          <div id="reviewKeyMoments" class="review-moments"></div>
+        </div>
+        <div class="review-section-block">
+          <h3>Your reviewed moves</h3>
+          <div id="reviewMoveList" class="review-move-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <script type="module" src="./app.js?v=3"></script>
+  <script type="module" src="./app.js?v=4"></script>
 </body>
 </html>
