@@ -7,13 +7,13 @@
   <meta name="description" content="Chess AI — a polished browser chess game with four AI difficulty levels and coach-led game review." />
   <title>Chess AI</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="./styles.css?v=4" />
+  <link rel="stylesheet" href="./styles.css?v=6" />
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar">
       <div class="brand" aria-label="Chess AI home">
-        <div class="brand-mark" aria-hidden="true">♞</div>
+        <div class="brand-mark" aria-hidden="true"><span id="brandPiece" class="brand-piece"></span></div>
         <div>
           <div class="brand-title">Chess AI</div>
           <div class="brand-subtitle">You vs. AI</div>
@@ -132,8 +132,13 @@
             <div class="panel-section move-section">
               <div class="panel-heading-row">
                 <h2>Moves</h2>
-                <span id="moveCount" class="tiny-label">0 moves</span>
+                <div class="history-nav" aria-label="Move history navigation">
+                  <button id="historyBackButton" class="history-arrow" type="button" aria-label="View previous move" title="Previous move (Left Arrow)">←</button>
+                  <span id="historyPositionLabel" class="tiny-label">Live</span>
+                  <button id="historyForwardButton" class="history-arrow" type="button" aria-label="View next move" title="Next move (Right Arrow)">→</button>
+                </div>
               </div>
+              <div id="moveCount" class="tiny-label move-count-label">0 moves</div>
               <div id="moveList" class="move-list" aria-live="polite"></div>
             </div>
 
@@ -143,7 +148,7 @@
 
             <div class="panel-section control-section">
               <div class="control-grid">
-                <button id="undoButton" class="secondary-button" type="button">↶ Undo</button>
+                <button id="undoButton" class="secondary-button" type="button">↶ Try Another Move</button>
                 <button id="restartButton" class="secondary-button" type="button">↻ Restart</button>
                 <button id="resignButton" class="danger-button" type="button">Resign</button>
                 <button id="newGameButton" class="secondary-button" type="button">New Game</button>
@@ -169,8 +174,9 @@
         <label class="setting-line"><span>Chess clock</span><input id="clockToggle" type="checkbox" checked /></label>
         <label class="setting-line"><span>Thinking animation</span><input id="thinkingToggle" type="checkbox" checked /></label>
         <label class="setting-select"><span>Board theme</span><select id="boardThemeSelect"><option value="forest">Forest</option><option value="slate">Slate</option><option value="sand">Sand</option><option value="ocean">Ocean</option></select></label>
-        <label class="setting-select"><span>Piece style</span><select id="pieceStyleSelect"><option value="filled">Filled</option><option value="traced">Traced</option></select></label>
-        <div class="build-version" aria-label="Application build version">Build 4.0</div>
+        <label class="setting-select"><span>Piece design</span><select id="pieceDesignSelect"><option value="modern">Modern</option><option value="classic">Classic</option><option value="minimal">Minimal</option><option value="bold">Bold</option></select></label>
+        <label class="setting-select"><span>Piece finish</span><select id="pieceStyleSelect"><option value="filled">Filled</option><option value="traced">Traced</option></select></label>
+        <div class="build-version" aria-label="Application build version">Build 6.0</div>
       </div>
     </div>
   </div>
@@ -189,6 +195,7 @@
       <p id="resultMessage">You win!</p>
       <div class="result-actions">
         <button id="reviewGameButton" class="primary-button" type="button">Game Review</button>
+        <button id="resultTryAnotherButton" class="secondary-button" type="button">Try Another Move</button>
         <button id="playAgainButton" class="secondary-button" type="button">Play Again</button>
         <button id="changeDifficultyButton" class="secondary-button" type="button">Change Difficulty</button>
         <button id="returnSetupButton" class="secondary-button" type="button">Return to Setup</button>
@@ -197,37 +204,43 @@
   </div>
 
   <div id="reviewModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
-    <div class="modal-card review-card">
+    <div class="modal-card review-card review-pager-card">
       <div class="modal-header">
         <div><div class="eyebrow">COACH REVIEW</div><h2 id="reviewTitle">Blurple's Review</h2></div>
-        <button class="icon-button close-modal" type="button" data-close="reviewModal" aria-label="Close review">×</button>
-      </div>
-      <div class="coach-intro">
-        <div id="coachAvatar" class="avatar blob-avatar coach-avatar" aria-hidden="true"></div>
-        <div class="coach-bubble">
-          <strong id="coachHeadline">Let’s review your game.</strong>
-          <p id="coachSummary">I’ll look at your decisions, highlight your best moments, and point out the biggest improvement areas.</p>
-        </div>
+        <button class="secondary-button review-skip-top" id="reviewSkipButton" type="button">Skip Review</button>
       </div>
       <div id="reviewLoading" class="review-loading hidden">Analyzing game…</div>
-      <div id="reviewContent" class="review-content">
-        <div class="review-summary-grid">
-          <div class="review-stat-card"><span class="label">Estimated Game Rating</span><strong id="reviewPlayerRating">—</strong><small>You</small></div>
-          <div class="review-stat-card"><span class="label">Accuracy</span><strong id="reviewPlayerAccuracy">—</strong><small>Your moves</small></div>
-          <div class="review-stat-card"><span class="label">AI Game Rating</span><strong id="reviewAiRating">—</strong><small id="reviewAiName">Opponent</small></div>
-          <div class="review-stat-card"><span class="label">AI Accuracy</span><strong id="reviewAiAccuracy">—</strong><small>Opponent moves</small></div>
+      <div id="reviewContent" class="review-content hidden">
+        <div class="review-compact-summary">
+          <div><span class="label">Estimated Game Rating</span><strong id="reviewPlayerRating">—</strong></div>
+          <div><span class="label">Accuracy</span><strong id="reviewPlayerAccuracy">—</strong></div>
+          <div class="review-progress-wrap"><span class="label">Review Progress</span><strong id="reviewPageLabel">Move 1 of 1</strong></div>
         </div>
-        <div class="review-section-block">
-          <h3>Your move quality</h3>
-          <div id="reviewCounts" class="review-count-grid"></div>
+
+        <div class="review-lesson-layout">
+          <div class="review-board-column">
+            <div id="reviewBoard" class="review-board" aria-label="Position before reviewed move"></div>
+          </div>
+          <div class="review-coach-column">
+            <div class="coach-intro review-coach-intro">
+              <div id="coachAvatar" class="avatar blob-avatar coach-avatar" aria-hidden="true"></div>
+              <div class="coach-bubble">
+                <span id="reviewMoveCategory" class="review-plain-category">Good move</span>
+                <strong id="coachHeadline">Let’s review this move.</strong>
+                <p id="coachSummary">Blurple will explain what happened in plain language.</p>
+              </div>
+            </div>
+            <div class="review-move-details">
+              <div class="review-move-title" id="reviewMoveTitle">Move the pawn from E2 to E4</div>
+              <div class="review-explanation" id="reviewMoveExplanation"></div>
+              <div id="reviewBestAlternative" class="review-best-alternative hidden"></div>
+            </div>
+          </div>
         </div>
-        <div class="review-section-block">
-          <h3>Key moments</h3>
-          <div id="reviewKeyMoments" class="review-moments"></div>
-        </div>
-        <div class="review-section-block">
-          <h3>Your reviewed moves</h3>
-          <div id="reviewMoveList" class="review-move-list"></div>
+
+        <div class="review-pager-controls">
+          <button id="reviewPrevButton" class="secondary-button review-nav-button" type="button" aria-label="Previous reviewed move">← Previous</button>
+          <button id="reviewNextButton" class="primary-button review-nav-button" type="button" aria-label="Next reviewed move">Next →</button>
         </div>
       </div>
     </div>
@@ -235,6 +248,6 @@
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <script type="module" src="./app.js?v=4"></script>
+  <script type="module" src="./app.js?v=6"></script>
 </body>
 </html>

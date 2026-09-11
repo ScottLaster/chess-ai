@@ -1,4 +1,4 @@
-# Chess AI — Build 3.0
+# Chess AI — Build 6.0
 
 A deployable, responsive browser chess game with four AI levels and a Stockfish 18 WASM-powered **Impossible** mode.
 
@@ -15,11 +15,11 @@ A deployable, responsive browser chess game with four AI levels and a Stockfish 
 - Legal-move, capture, last-move, selection, and check highlights.
 - Responsive board orientation based on the human side.
 - 10:00 clocks with an untimed option.
-- Move history, captured pieces, material indicator, undo, restart, resign, new-game flow.
+- Move history with read-only back/forward navigation, captured pieces, material indicator, Try Another Move, restart, resign, new-game flow.
 - Promotion chooser.
 - Optional synthesized move/capture/check/game sounds.
 - Settings: sound, animation, coordinates, legal moves, clock, board themes, piece styles, thinking animation.
-- AI status plus Stockfish evaluation/depth when available.
+- AI status, position evaluation, educational key ideas, and a coach-led post-game review.
 - Keyboard focus/Enter-to-select support and visible focus states.
 
 ## Run locally
@@ -77,3 +77,16 @@ This original app code may be used and modified by the project owner. Third-part
 - Replaced Unicode filled pieces with deterministic inline SVG pieces so White pieces cannot render as black due to platform glyph/emoji behavior.
 - Fixed desktop drag-and-drop by capturing the pointer on the persistent board element before board redraws.
 - Added cache-busting version parameters for app assets and a visible **Build 3.0** marker in Settings to make GitHub Pages deployment verification easier.
+
+
+## Build 5.0 design iteration
+
+Build 5 adds a unified piece-rendering system with four selectable designs (Modern, Classic, Minimal, Bold) and separate Filled/Traced finishes. The selected design is used consistently on the setup screen, board, drag ghost, captured pieces, and promotion choices. Opponent pieces are tinted to match Breen/Bellow/Brange/Bred. Blurple now wears glasses. The former Undo control is now an educational **Try Another Move** action that returns to the position before the human player’s last move, including after the AI has replied. Post-game review highlights a smaller set of critical moves using plain-English move descriptions rather than algebraic chess notation.
+
+
+## Build 6.0 design iteration
+
+- Added read-only move-history navigation with on-screen left/right arrows and desktop keyboard Left/Right Arrow support. Historical positions pause the clock and cannot be edited; moving forward to Live restores normal play.
+- Rebuilt Game Review as a move-by-move Blurple lesson. Every human move receives its own page with a reconstructed board, a visual origin-to-destination arrow, plain-language move description, coach explanation, and a stronger alternative when relevant. Previous/Next and Skip Review controls are included.
+- AI piece tinting now changes by both opponent and side: lighter Breen/Bellow/Brange/Bred shades when the AI is White and darker shades when the AI is Black.
+- Blurple retains the instructor-style glasses introduced in Build 5.

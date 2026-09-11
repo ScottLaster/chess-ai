@@ -288,3 +288,104 @@ body[data-board-theme="ocean"] { --board-light: #d9e5df; --board-dark: #4e7f86; 
 }
 
 .build-version { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; text-align: right; letter-spacing: .04em; }
+
+/* Build 5: unified piece rendering */
+.choice-piece-icon { width: 40px; height: 40px; }
+.choice-piece-icon .piece,
+.choice-piece-icon .piece-svg,
+.choice-piece-icon .piece-split { width: 40px; height: 40px; min-width: 40px; min-height: 40px; }
+.choice-piece-icon .piece { cursor: default; }
+.piece-ai {
+  color: var(--ai-piece-color, #d94e45);
+  --piece-edge: var(--ai-piece-edge, #571c18);
+  --piece-detail: var(--ai-piece-detail, #64211d);
+}
+.piece-style-traced .piece-ai .piece-svg { filter: drop-shadow(0 1px 1px rgba(0,0,0,.55)); }
+
+/* Blurple coach glasses */
+.blob-glasses {
+  position: absolute;
+  top: 31%;
+  width: 24%;
+  height: 20%;
+  border: 2.5px solid #1d1b2d;
+  border-radius: 45%;
+  z-index: 4;
+  background: rgba(255,255,255,.08);
+}
+.blob-glasses.left { left: 24%; }
+.blob-glasses.right { right: 24%; }
+.blob-glasses-bridge {
+  position: absolute;
+  left: 47%;
+  top: 39%;
+  width: 7%;
+  height: 2.5px;
+  background: #1d1b2d;
+  border-radius: 999px;
+  z-index: 4;
+}
+.blob-body.blurple .blob-eye { z-index: 5; }
+
+/* The educational undo action has a longer label. */
+.control-grid #undoButton { line-height: 1.1; }
+
+@media (max-width: 560px) {
+  .choice-piece-icon,
+  .choice-piece-icon .piece,
+  .choice-piece-icon .piece-svg,
+  .choice-piece-icon .piece-split { width: 34px; height: 34px; min-width: 34px; min-height: 34px; }
+}
+.brand-piece, .brand-piece .piece, .brand-piece .piece-svg { width: 34px; height: 34px; display: grid; place-items: center; }
+.brand-piece .piece { cursor: default; }
+
+/* Build 6: view-only move history */
+.history-nav { display: inline-flex; align-items: center; gap: 7px; }
+.history-arrow { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); display: grid; place-items: center; font-weight: 900; padding: 0; }
+.history-arrow:hover:not(:disabled) { background: var(--surface-3); }
+.history-arrow:disabled { opacity: .3; cursor: default; }
+#historyPositionLabel { min-width: 42px; text-align: center; }
+.move-count-label { margin-top: 5px; }
+.history-viewing .board-wrap { box-shadow: 0 18px 50px rgba(0,0,0,.32), inset 0 0 0 3px rgba(142,123,255,.35); }
+.history-viewing .piece { cursor: default; }
+.history-viewing .thinking-overlay { display: none !important; }
+
+/* Build 6: move-by-move Blurple lesson */
+.review-pager-card { width: min(980px, 100%); }
+.review-skip-top { min-height: 38px; }
+.review-compact-summary { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 18px; }
+.review-compact-summary > div { border: 1px solid var(--line); background: rgba(255,255,255,.03); border-radius: 12px; padding: 11px 13px; }
+.review-compact-summary strong { display: block; margin-top: 4px; font-size: 17px; }
+.review-progress-wrap { text-align: right; }
+.review-lesson-layout { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(270px, .95fr); gap: 22px; align-items: start; margin-top: 18px; }
+.review-board-column { width: 100%; }
+.review-board { position: relative; width: min(100%, 470px); aspect-ratio: 1; display: grid; grid-template-columns: repeat(8,1fr); grid-template-rows: repeat(8,1fr); border-radius: 6px; overflow: hidden; box-shadow: 0 14px 34px rgba(0,0,0,.28); background: #333; }
+.review-board .review-square { position: relative; display: grid; place-items: center; }
+.review-board .review-square.light { background: var(--board-light); }
+.review-board .review-square.dark { background: var(--board-dark); }
+.review-board .piece { width: 88%; height: 88%; cursor: default; }
+.review-board .review-source::after, .review-board .review-target::after { content:""; position:absolute; inset:0; pointer-events:none; }
+.review-board .review-source::after { background: rgba(142,123,255,.2); }
+.review-board .review-target::after { background: rgba(166,212,104,.26); }
+.review-arrow-overlay { position: absolute; inset: 0; z-index: 20; pointer-events: none; width: 100%; height: 100%; }
+.review-arrow-line { stroke: #7b67f1; stroke-width: 3.6; stroke-linecap: round; opacity: .92; }
+.review-arrow-head { fill: #7b67f1; opacity: .96; }
+.review-coach-column { min-width: 0; }
+.review-coach-intro { margin-top: 0; }
+.review-plain-category { display: inline-block; margin-bottom: 8px; padding: 4px 8px; border-radius: 999px; background: rgba(142,123,255,.16); color: #c8c0ff; font-size: 10px; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+.review-move-details { margin-top: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); border-radius: 14px; padding: 15px; }
+.review-move-title { font-size: 18px; font-weight: 850; line-height: 1.25; }
+.review-explanation { margin-top: 10px; color: var(--muted); line-height: 1.5; font-size: 14px; }
+.review-best-alternative { margin-top: 12px; padding: 11px 12px; border-radius: 10px; background: rgba(143,189,85,.1); border: 1px solid rgba(143,189,85,.18); font-size: 13px; color: #d9eacb; line-height: 1.4; }
+.review-pager-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.review-nav-button { min-height: 46px; }
+
+/* AI pieces: color variables now reflect both opponent and whether AI is White/Black */
+.piece-ai { color: var(--ai-piece-color, #d94e45); --piece-edge: var(--ai-piece-edge, #571c18); --piece-detail: var(--ai-piece-detail, #64211d); }
+
+@media (max-width: 760px) {
+  .review-lesson-layout { grid-template-columns: 1fr; }
+  .review-board { width: min(100%, 520px); margin-inline: auto; }
+  .review-compact-summary { grid-template-columns: 1fr 1fr; }
+  .review-progress-wrap { grid-column: 1 / -1; text-align: left; }
+}
