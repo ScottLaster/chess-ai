@@ -1,4 +1,4 @@
-# Chess AI — Build 6.0
+# Chess AI — Build 7.0
 
 A deployable, responsive browser chess game with four AI levels and a Stockfish 18 WASM-powered **Impossible** mode.
 
@@ -90,3 +90,12 @@ Build 5 adds a unified piece-rendering system with four selectable designs (Mode
 - Rebuilt Game Review as a move-by-move Blurple lesson. Every human move receives its own page with a reconstructed board, a visual origin-to-destination arrow, plain-language move description, coach explanation, and a stronger alternative when relevant. Previous/Next and Skip Review controls are included.
 - AI piece tinting now changes by both opponent and side: lighter Breen/Bellow/Brange/Bred shades when the AI is White and darker shades when the AI is Black.
 - Blurple retains the instructor-style glasses introduced in Build 5.
+
+
+## Build 7.0 design iteration
+
+- Game Review now ends on a complete beginner-friendly summary with totals for every move-quality category; **Skip to Summary** goes directly there.
+- Blurple has larger, clearer librarian-style glasses.
+- Mobile move-list updates are contained inside the move panel and no longer call `scrollIntoView`, preventing the page from snapping away from the board after moves.
+- Review move arrows are now a smaller purple dotted path with a compact arrowhead at the destination.
+- Tap/click selection is restored: a simple press selects a movable piece without requiring the user to start dragging it first. Drag-and-drop remains available.

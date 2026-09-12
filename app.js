@@ -32,52 +32,122 @@ const STOCKFISH_SOURCES = [
 const PIECE_SETS = {
   modern: {
     p: `
-      <path class="piece-body" d="M50 17 C56 17 61 22 61 28 C61 32 59 35 56 38 C63 42 67 49 66 58 L70 69 H30 L34 58 C33 49 37 42 44 38 C41 35 39 32 39 28 C39 22 44 17 50 17 Z" />
-      <path class="piece-body" d="M28 69 H72 L79 84 H21 Z" />`,
+      <circle class="piece-body" cx="50" cy="23" r="11" />
+      <path class="piece-body" d="M42 35 C41 44 39 49 36 58 H64 C61 49 59 44 58 35 Z" />
+      <path class="piece-body" d="M34 58 H66 L71 70 H29 Z" />
+      <path class="piece-body" d="M26 70 H74 L80 84 H20 Z" />
+      <path class="piece-detail" d="M39 64 H61" />`,
     r: `
-      <path class="piece-body" d="M24 22 H35 V31 H43 V22 H50 V31 H57 V22 H65 V31 H76 V44 L69 49 L66 69 H34 L31 49 L24 44 Z" />
-      <path class="piece-body" d="M28 69 H72 L79 84 H21 Z" /><path class="piece-detail" d="M33 48 H67" />`,
+      <path class="piece-body" d="M24 21 H34 V30 H42 V21 H50 V30 H58 V21 H66 V30 H76 V44 H69 L66 68 H34 L31 44 H24 Z" />
+      <path class="piece-body" d="M26 68 H74 L80 84 H20 Z" />
+      <path class="piece-detail" d="M34 45 H66 M36 60 H64" />`,
     n: `
-      <path class="piece-body" d="M30 83 C31 68 36 56 45 48 L38 41 L49 18 L67 27 C73 30 77 36 78 46 L66 52 L62 69 H72 L78 83 Z" />
-      <path class="piece-detail" d="M50 19 L54 33 L42 40" /><circle class="piece-detail-dot" cx="63" cy="37" r="2.7" />`,
+      <path class="piece-body" d="M28 84 C30 71 34 60 43 50 L38 42 L47 19 L66 25 C74 28 79 35 80 45 C75 47 69 50 64 54 C61 57 59 61 58 68 H71 L78 84 Z" />
+      <path class="piece-detail" d="M49 23 C56 26 62 31 67 36" />
+      <path class="piece-detail" d="M43 50 C50 47 56 47 63 49" />
+      <circle class="piece-detail-dot" cx="63" cy="36" r="2.8" />`,
     b: `
-      <path class="piece-body" d="M50 15 C60 23 64 30 63 37 C62 43 57 48 55 54 L66 69 H34 L45 54 C43 48 38 43 37 37 C36 30 40 23 50 15 Z" />
-      <path class="piece-body" d="M28 69 H72 L79 84 H21 Z" /><path class="piece-detail" d="M43 28 L57 43" />`,
+      <path class="piece-body" d="M50 15 C58 20 62 27 62 34 C62 42 57 48 53 55 L64 69 H36 L47 55 C43 48 38 42 38 34 C38 27 42 20 50 15 Z" />
+      <path class="piece-body" d="M28 69 H72 L79 84 H21 Z" />
+      <path class="piece-detail" d="M45 27 L56 42" />`,
     q: `
-      <path class="piece-body" d="M25 30 L37 46 L50 26 L63 46 L75 30 L68 68 H32 Z" /><path class="piece-body" d="M27 68 H73 L80 84 H20 Z" />
-      <circle class="piece-body" cx="25" cy="24" r="5" /><circle class="piece-body" cx="50" cy="18" r="5" /><circle class="piece-body" cx="75" cy="24" r="5" /><path class="piece-detail" d="M36 57 H64" />`,
+      <circle class="piece-body" cx="24" cy="24" r="4.5" /><circle class="piece-body" cx="38" cy="18" r="4.5" /><circle class="piece-body" cx="50" cy="16" r="4.5" /><circle class="piece-body" cx="62" cy="18" r="4.5" /><circle class="piece-body" cx="76" cy="24" r="4.5" />
+      <path class="piece-body" d="M24 29 L34 47 L42 30 L50 47 L58 30 L66 47 L76 29 L68 68 H32 Z" />
+      <path class="piece-body" d="M27 68 H73 L80 84 H20 Z" />
+      <path class="piece-detail" d="M35 58 H65" />`,
     k: `
-      <path class="piece-body" d="M38 40 H62 C68 48 66 56 61 63 L68 70 H32 L39 63 C34 56 32 48 38 40 Z" /><path class="piece-body" d="M28 70 H72 L79 84 H21 Z" /><path class="piece-detail piece-cross" d="M50 13 V34 M39 23 H61" />`,
+      <path class="piece-detail piece-cross" d="M50 10 V31 M41 20 H59" />
+      <path class="piece-body" d="M39 33 H61 C67 40 67 49 62 57 L58 63 L67 70 H33 L42 63 L38 57 C33 49 33 40 39 33 Z" />
+      <path class="piece-body" d="M27 70 H73 L80 84 H20 Z" />
+      <path class="piece-detail" d="M38 49 H62" />`,
   },
   classic: {
     p: `
-      <circle class="piece-body" cx="50" cy="25" r="11" /><path class="piece-body" d="M42 36 H58 C61 43 61 50 58 57 L66 69 H34 L42 57 C39 50 39 43 42 36 Z" /><path class="piece-body" d="M29 69 H71 L78 82 H22 Z" /><path class="piece-detail" d="M35 64 H65" />`,
+      <circle class="piece-body" cx="50" cy="21" r="12" />
+      <path class="piece-body" d="M45 34 C44 38 42 43 39 48 C37 51 37 55 39 59 L61 59 C63 55 63 51 61 48 C58 43 56 38 55 34 Z" />
+      <path class="piece-body" d="M34 59 H66 L69 68 H31 Z" />
+      <path class="piece-body" d="M28 68 H72 L76 76 H24 Z" />
+      <path class="piece-body" d="M22 76 H78 L82 84 H18 Z" />
+      <path class="piece-detail" d="M36 65 H64 M31 73 H69" />`,
     r: `
-      <path class="piece-body" d="M25 21 H37 V30 H45 V21 H55 V30 H63 V21 H75 V40 H69 L65 68 H35 L31 40 H25 Z" /><path class="piece-body" d="M29 68 H71 L78 82 H22 Z" /><path class="piece-detail" d="M34 45 H66 M36 61 H64" />`,
+      <path class="piece-body" d="M22 19 H33 V29 H40 V19 H47 V29 H53 V19 H60 V29 H67 V19 H78 V35 L72 39 L68 67 H32 L28 39 L22 35 Z" />
+      <path class="piece-body" d="M27 67 H73 L77 76 H23 Z" />
+      <path class="piece-body" d="M22 76 H78 L82 84 H18 Z" />
+      <path class="piece-detail" d="M33 43 H67 M35 58 H65" />`,
     n: `
-      <path class="piece-body" d="M27 82 C30 68 35 57 45 48 C40 43 40 37 44 30 L51 18 L69 28 C75 33 78 40 77 50 C69 52 64 56 61 61 L58 69 H70 L77 82 Z" /><path class="piece-detail" d="M47 29 C53 31 59 34 64 39" /><circle class="piece-detail-dot" cx="63" cy="37" r="2.6" />`,
+      <path class="piece-body" d="M25 84 C27 74 30 67 34 61 C37 56 41 51 45 47 C40 44 37 39 38 33 C39 28 43 23 47 18 L67 24 C75 27 79 36 79 46 C72 48 66 51 61 57 C59 60 58 63 57 68 H69 L76 76 L79 84 Z" />
+      <path class="piece-detail" d="M46 24 C54 26 60 30 66 36" />
+      <path class="piece-detail" d="M43 49 C49 47 56 47 62 49" />
+      <circle class="piece-detail-dot" cx="64" cy="36" r="2.6" />`,
     b: `
-      <circle class="piece-body" cx="50" cy="23" r="8" /><path class="piece-body" d="M50 29 C61 36 64 43 59 52 L55 58 L65 69 H35 L45 58 L41 52 C36 43 39 36 50 29 Z" /><path class="piece-body" d="M29 69 H71 L78 82 H22 Z" /><path class="piece-detail" d="M45 33 L56 45" />`,
+      <circle class="piece-body" cx="50" cy="18" r="5.5" />
+      <path class="piece-body" d="M50 25 C61 31 66 40 63 48 C61 54 57 58 54 62 L64 68 H36 L46 62 C43 58 39 54 37 48 C34 40 39 31 50 25 Z" />
+      <path class="piece-body" d="M28 68 H72 L76 76 H24 Z" />
+      <path class="piece-body" d="M22 76 H78 L82 84 H18 Z" />
+      <path class="piece-detail" d="M44 30 L57 44" />`,
     q: `
-      <circle class="piece-body" cx="25" cy="25" r="4.5" /><circle class="piece-body" cx="38" cy="19" r="4.5" /><circle class="piece-body" cx="50" cy="16" r="4.5" /><circle class="piece-body" cx="62" cy="19" r="4.5" /><circle class="piece-body" cx="75" cy="25" r="4.5" /><path class="piece-body" d="M25 30 L35 49 L43 31 L50 50 L57 31 L65 49 L75 30 L67 68 H33 Z" /><path class="piece-body" d="M28 68 H72 L79 82 H21 Z" /><path class="piece-detail" d="M35 59 H65" />`,
+      <circle class="piece-body" cx="22" cy="24" r="4" /><circle class="piece-body" cx="36" cy="18" r="4" /><circle class="piece-body" cx="50" cy="15" r="4" /><circle class="piece-body" cx="64" cy="18" r="4" /><circle class="piece-body" cx="78" cy="24" r="4" />
+      <path class="piece-body" d="M22 29 L32 47 L40 31 L50 49 L60 31 L68 47 L78 29 L70 68 H30 Z" />
+      <path class="piece-body" d="M26 68 H74 L78 76 H22 Z" />
+      <path class="piece-body" d="M20 76 H80 L84 84 H16 Z" />
+      <path class="piece-detail" d="M34 57 H66 M30 64 H70" />`,
     k: `
-      <path class="piece-detail piece-cross" d="M50 12 V33 M40 22 H60" /><path class="piece-body" d="M40 34 H60 C67 41 68 49 63 57 L59 63 L67 69 H33 L41 63 L37 57 C32 49 33 41 40 34 Z" /><path class="piece-body" d="M28 69 H72 L79 82 H21 Z" /><path class="piece-detail" d="M38 50 H62" />`,
+      <path class="piece-detail piece-cross" d="M50 8 V28 M42 18 H58" />
+      <path class="piece-body" d="M40 31 H60 C66 37 69 44 67 52 C66 57 62 61 58 66 L67 72 H33 L42 66 C38 61 34 57 33 52 C31 44 34 37 40 31 Z" />
+      <path class="piece-body" d="M27 72 H73 L77 79 H23 Z" />
+      <path class="piece-body" d="M21 79 H79 L84 87 H16 Z" />
+      <path class="piece-detail" d="M39 49 H61" />`,
   },
   minimal: {
-    p: `<circle class="piece-body" cx="50" cy="25" r="10" /><path class="piece-body" d="M41 37 H59 L64 66 H36 Z" /><path class="piece-body" d="M27 68 H73 L78 82 H22 Z" />`,
-    r: `<path class="piece-body" d="M27 23 H38 V31 H46 V23 H54 V31 H62 V23 H73 V42 H67 L64 68 H36 L33 42 H27 Z" /><path class="piece-body" d="M27 68 H73 L78 82 H22 Z" />`,
-    n: `<path class="piece-body" d="M28 82 L35 61 L46 48 L41 38 L50 20 L70 30 L77 46 L63 52 L59 68 H70 L77 82 Z" /><circle class="piece-detail-dot" cx="63" cy="38" r="2.7" />`,
-    b: `<path class="piece-body" d="M50 17 L62 36 L56 56 L65 68 H35 L44 56 L38 36 Z" /><path class="piece-body" d="M27 68 H73 L78 82 H22 Z" /><path class="piece-detail" d="M45 29 L56 42" />`,
-    q: `<path class="piece-body" d="M24 27 L36 48 L50 24 L64 48 L76 27 L67 68 H33 Z" /><path class="piece-body" d="M26 68 H74 L79 82 H21 Z" />`,
-    k: `<path class="piece-detail piece-cross" d="M50 13 V34 M40 23 H60" /><path class="piece-body" d="M38 37 H62 L61 62 L68 68 H32 L39 62 Z" /><path class="piece-body" d="M26 68 H74 L79 82 H21 Z" />`,
+    p: `
+      <circle class="piece-body" cx="50" cy="23" r="10" />
+      <path class="piece-body" d="M42 36 H58 L62 60 H38 Z" />
+      <path class="piece-body" d="M31 60 H69 L74 72 H26 Z" />
+      <path class="piece-body" d="M24 72 H76 L80 84 H20 Z" />`,
+    r: `
+      <path class="piece-body" d="M24 23 H35 V32 H43 V23 H50 V32 H57 V23 H65 V32 H76 V45 H69 L66 67 H34 L31 45 H24 Z" />
+      <path class="piece-body" d="M24 67 H76 L80 84 H20 Z" />`,
+    n: `
+      <path class="piece-body" d="M29 84 L36 61 L47 49 L41 39 L49 20 L68 28 L77 44 L64 51 L59 67 H71 L79 84 Z" />
+      <circle class="piece-detail-dot" cx="63" cy="37" r="2.8" />`,
+    b: `
+      <path class="piece-body" d="M50 16 L61 34 L55 55 L64 68 H36 L45 55 L39 34 Z" />
+      <path class="piece-body" d="M24 68 H76 L80 84 H20 Z" />
+      <path class="piece-detail" d="M45 28 L56 41" />`,
+    q: `
+      <circle class="piece-body" cx="28" cy="24" r="4" /><circle class="piece-body" cx="50" cy="17" r="4" /><circle class="piece-body" cx="72" cy="24" r="4" />
+      <path class="piece-body" d="M24 29 L36 48 L50 26 L64 48 L76 29 L68 68 H32 Z" />
+      <path class="piece-body" d="M24 68 H76 L80 84 H20 Z" />`,
+    k: `
+      <path class="piece-detail piece-cross" d="M50 10 V30 M41 20 H59" />
+      <path class="piece-body" d="M39 34 H61 L59 61 L68 70 H32 L41 61 Z" />
+      <path class="piece-body" d="M24 70 H76 L80 84 H20 Z" />`,
   },
   bold: {
-    p: `<circle class="piece-body" cx="50" cy="25" r="12" /><path class="piece-body" d="M39 38 H61 L68 68 H32 Z" /><path class="piece-body" d="M24 68 H76 L82 84 H18 Z" />`,
-    r: `<path class="piece-body" d="M21 20 H36 V32 H44 V20 H56 V32 H64 V20 H79 V44 L70 49 L67 68 H33 L30 49 L21 44 Z" /><path class="piece-body" d="M23 68 H77 L82 84 H18 Z" />`,
-    n: `<path class="piece-body" d="M24 84 C26 67 34 55 44 47 L37 38 L49 15 L70 26 C78 31 81 40 79 50 L65 56 L61 68 H73 L80 84 Z" /><path class="piece-detail" d="M49 19 L55 34 L42 40" /><circle class="piece-detail-dot" cx="65" cy="37" r="3" />`,
-    b: `<path class="piece-body" d="M50 13 C62 22 68 31 65 40 C63 48 58 53 57 58 L68 68 H32 L43 58 C42 53 37 48 35 40 C32 31 38 22 50 13 Z" /><path class="piece-body" d="M23 68 H77 L82 84 H18 Z" /><path class="piece-detail" d="M42 27 L59 44" />`,
-    q: `<circle class="piece-body" cx="23" cy="24" r="6" /><circle class="piece-body" cx="50" cy="17" r="6" /><circle class="piece-body" cx="77" cy="24" r="6" /><path class="piece-body" d="M21 30 L35 51 L50 25 L65 51 L79 30 L69 68 H31 Z" /><path class="piece-body" d="M22 68 H78 L83 84 H17 Z" />`,
-    k: `<path class="piece-detail piece-cross" d="M50 10 V35 M38 23 H62" /><path class="piece-body" d="M36 38 H64 C71 47 69 57 62 64 L68 68 H32 L38 64 C31 57 29 47 36 38 Z" /><path class="piece-body" d="M22 68 H78 L83 84 H17 Z" />`,
+    p: `
+      <circle class="piece-body" cx="50" cy="24" r="13" />
+      <path class="piece-body" d="M39 38 H61 L68 63 H32 Z" />
+      <path class="piece-body" d="M28 63 H72 L78 73 H22 Z" />
+      <path class="piece-body" d="M20 73 H80 L86 86 H14 Z" />`,
+    r: `
+      <path class="piece-body" d="M19 20 H34 V32 H42 V20 H50 V32 H58 V20 H66 V32 H81 V46 L72 52 L68 66 H32 L28 52 L19 46 Z" />
+      <path class="piece-body" d="M19 66 H81 L86 86 H14 Z" />`,
+    n: `
+      <path class="piece-body" d="M24 86 C26 72 31 61 42 50 L35 40 L48 14 L70 24 C79 29 83 39 82 50 L67 57 L63 66 H74 L82 86 Z" />
+      <path class="piece-detail" d="M50 19 L56 34 L42 40" />
+      <circle class="piece-detail-dot" cx="66" cy="37" r="3.1" />`,
+    b: `
+      <path class="piece-body" d="M50 13 C63 21 70 30 67 40 C65 49 59 55 57 60 L68 67 H32 L43 60 C41 55 35 49 33 40 C30 30 37 21 50 13 Z" />
+      <path class="piece-body" d="M19 67 H81 L86 86 H14 Z" />
+      <path class="piece-detail" d="M42 26 L59 44" />`,
+    q: `
+      <circle class="piece-body" cx="22" cy="24" r="5.5" /><circle class="piece-body" cx="36" cy="18" r="5.5" /><circle class="piece-body" cx="50" cy="15" r="5.5" /><circle class="piece-body" cx="64" cy="18" r="5.5" /><circle class="piece-body" cx="78" cy="24" r="5.5" />
+      <path class="piece-body" d="M20 30 L34 50 L50 24 L66 50 L80 30 L70 67 H30 Z" />
+      <path class="piece-body" d="M19 67 H81 L86 86 H14 Z" />`,
+    k: `
+      <path class="piece-detail piece-cross" d="M50 8 V33 M38 20 H62" />
+      <path class="piece-body" d="M37 35 H63 C72 45 70 57 62 65 L69 71 H31 L38 65 C30 57 28 45 37 35 Z" />
+      <path class="piece-body" d="M19 71 H81 L86 86 H14 Z" />`,
   },
 };
 
@@ -130,6 +200,7 @@ let engineTelemetry = { status:'Ready', position:'Equal (0.0)', keyIdea:'Develop
 let historyViewPly = null;
 let historyViewGame = null;
 let reviewPageIndex = 0;
+let reviewShowingSummary = false;
 
 function loadSettings() {
   try {
@@ -204,7 +275,7 @@ function bindControls() {
   $('resultTryAnotherButton').addEventListener('click', tryAnotherMove);
   $('reviewPrevButton').addEventListener('click', () => changeReviewPage(-1));
   $('reviewNextButton').addEventListener('click', () => changeReviewPage(1));
-  $('reviewSkipButton').addEventListener('click', () => closeModal('reviewModal'));
+  $('reviewSkipButton').addEventListener('click', () => showReviewSummary());
   document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.close)));
   ['settingsModal','reviewModal'].forEach(id => $(id).addEventListener('click', (e) => { if (e.target === $(id)) closeModal(id); }));
 }
@@ -271,7 +342,7 @@ async function startNewGame({ preserveSide }) {
   clocks = { w: 600000, b: 600000 };
   currentEngineSearchId++;
   currentReview = null;
-  historyViewPly = null; historyViewGame = null; reviewPageIndex = 0;
+  historyViewPly = null; historyViewGame = null; reviewPageIndex = 0; reviewShowingSummary = false;
   document.body.classList.remove('history-viewing');
   engineTelemetry = { status:'Ready', position:'Equal (0.0)', keyIdea:'Develop pieces', scoreCp:0, scoreText:'Equal', depth:'—' };
 
@@ -297,7 +368,7 @@ function returnToSetup() {
   gameGeneration++;
   stopClock(); stopStockfishSearch(); resetAiWorker(); isAiThinking = false; gameEnded = false;
   closeModal('resultModal'); closeModal('reviewModal');
-  historyViewPly = null; historyViewGame = null; reviewPageIndex = 0; document.body.classList.remove('history-viewing');
+  historyViewPly = null; historyViewGame = null; reviewPageIndex = 0; reviewShowingSummary = false; document.body.classList.remove('history-viewing');
   $('gameScreen').classList.add('hidden');
   $('setupScreen').classList.remove('hidden');
 }
@@ -551,7 +622,12 @@ function onPiecePointerUp(e) {
   if (!pointerDrag || e.pointerId !== pointerDrag.pointerId) return;
   const drag = pointerDrag; pointerDrag = null;
   const board = $('board');
-  if (!drag.dragging) { try { if (board.hasPointerCapture(e.pointerId)) board.releasePointerCapture(e.pointerId); } catch {} return; }
+  if (!drag.dragging) {
+    try { if (board.hasPointerCapture(e.pointerId)) board.releasePointerCapture(e.pointerId); } catch {}
+    suppressClickUntil = performance.now() + 300;
+    onSquareClick(drag.source);
+    return;
+  }
   e.preventDefault();
   const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.square')?.dataset.square;
   cleanupDragGhost();
@@ -770,7 +846,7 @@ function scoreMoveOnePly(chess, move, perspective) {
 
 function ensureAiWorker() {
   if (aiWorker) return aiWorker;
-  aiWorker = new Worker('./ai-worker.js?v=5', { type: 'module' });
+  aiWorker = new Worker('./ai-worker.js?v=8', { type: 'module' });
   aiWorker.onmessage = (event) => {
     const { id, move, error, stats } = event.data || {};
     const pending = aiWorkerPending.get(id);
@@ -1071,7 +1147,12 @@ function updateMoveList() {
     list.appendChild(row);
   }
   const activeCell = list.querySelector('.latest');
-  if (activeCell) activeCell.scrollIntoView({ block:'nearest' });
+  if (activeCell) {
+    // Keep scrolling contained inside the move list. scrollIntoView() can move the entire
+    // mobile page and pull the chessboard off-screen after every move.
+    const desiredTop = Math.max(0, activeCell.offsetTop - Math.max(0, (list.clientHeight - activeCell.offsetHeight) / 2));
+    list.scrollTop = desiredTop;
+  }
   $('moveCount').textContent = `${history.length} move${history.length === 1 ? '' : 's'}`;
 }
 
@@ -1164,6 +1245,7 @@ async function openReviewModal() {
   try {
     if (!currentReview) currentReview = await analyzeCompletedGame();
     reviewPageIndex = 0;
+    reviewShowingSummary = false;
     renderReview(currentReview);
   } catch (err) {
     console.error(err);
@@ -1396,14 +1478,31 @@ function renderReview(review) {
   $('reviewPlayerRating').textContent = review.player.rating.toLocaleString();
   $('reviewPlayerAccuracy').textContent = `${review.player.accuracy.toFixed(1)}%`;
   reviewPageIndex = clamp(0, Math.max(0, review.player.moves.length - 1), reviewPageIndex);
+  reviewShowingSummary = false;
+  $('reviewLessonScreen').classList.remove('hidden');
+  $('reviewSummaryScreen').classList.add('hidden');
   renderReviewPage();
 }
 
 function changeReviewPage(delta) {
-  if (!currentReview?.player?.moves?.length) { if (delta > 0) closeModal('reviewModal'); return; }
-  const last = currentReview.player.moves.length - 1;
+  if (!currentReview) return;
+  const moves = currentReview.player?.moves || [];
+  if (reviewShowingSummary) {
+    if (delta < 0 && moves.length) {
+      reviewShowingSummary = false;
+      reviewPageIndex = moves.length - 1;
+      $('reviewSummaryScreen').classList.add('hidden');
+      $('reviewLessonScreen').classList.remove('hidden');
+      renderReviewPage();
+    } else if (delta > 0) {
+      closeModal('reviewModal');
+    }
+    return;
+  }
+  if (!moves.length) { showReviewSummary(); return; }
+  const last = moves.length - 1;
   if (delta > 0 && reviewPageIndex >= last) {
-    closeModal('reviewModal');
+    showReviewSummary();
     return;
   }
   reviewPageIndex = clamp(0, last, reviewPageIndex + delta);
@@ -1412,16 +1511,11 @@ function changeReviewPage(delta) {
 
 function renderReviewPage() {
   const moves = currentReview?.player?.moves || [];
-  if (!moves.length) {
-    $('reviewPageLabel').textContent = 'No moves';
-    $('coachHeadline').textContent = 'There are no moves to review.';
-    $('coachSummary').textContent = 'Play a game first, then I can walk through your choices with you.';
-    $('reviewBoard').innerHTML = '';
-    $('reviewPrevButton').disabled = true;
-    $('reviewNextButton').textContent = 'Done';
-    return;
-  }
+  if (!moves.length) { showReviewSummary(); return; }
 
+  reviewShowingSummary = false;
+  $('reviewLessonScreen').classList.remove('hidden');
+  $('reviewSummaryScreen').classList.add('hidden');
   const item = moves[reviewPageIndex];
   const plainCategory = plainReviewCategory(item.classification);
   $('reviewPageLabel').textContent = `Move ${reviewPageIndex + 1} of ${moves.length}`;
@@ -1443,7 +1537,63 @@ function renderReviewPage() {
 
   renderReviewBoard(item);
   $('reviewPrevButton').disabled = reviewPageIndex === 0;
-  $('reviewNextButton').textContent = reviewPageIndex === moves.length - 1 ? 'Finish Review' : 'Next →';
+  $('reviewPrevButton').textContent = '← Previous';
+  $('reviewNextButton').textContent = reviewPageIndex === moves.length - 1 ? 'View Summary →' : 'Next →';
+  $('reviewSkipButton').textContent = 'Skip to Summary';
+}
+
+function showReviewSummary() {
+  if (!currentReview) return;
+  reviewShowingSummary = true;
+  $('reviewLessonScreen').classList.add('hidden');
+  $('reviewSummaryScreen').classList.remove('hidden');
+  $('summaryCoachAvatar').innerHTML = blobMarkup(OPPONENTS.coach.key, 'smile');
+  $('reviewSummaryRating').textContent = currentReview.player.rating.toLocaleString();
+  $('reviewSummaryAccuracy').textContent = `${currentReview.player.accuracy.toFixed(1)}%`;
+  $('reviewSummaryHeadline').textContent = currentReview.coach?.headline || 'Here’s the full picture.';
+  $('reviewSummaryText').textContent = currentReview.coach?.summary || 'This is your complete move-quality summary.';
+  $('reviewSummaryTakeaway').textContent = buildBeginnerTakeaway(currentReview.player);
+  renderReviewSummaryCounts(currentReview.player.counts);
+  $('reviewPrevButton').disabled = !(currentReview.player.moves?.length);
+  $('reviewPrevButton').textContent = '← Last Move';
+  $('reviewNextButton').textContent = 'Finish Review';
+  $('reviewSkipButton').textContent = 'Summary';
+}
+
+function renderReviewSummaryCounts(counts) {
+  const container = $('reviewSummaryCounts');
+  container.innerHTML = '';
+  REVIEW_ORDER.forEach(key => {
+    const item = document.createElement('div');
+    item.className = `review-summary-count-item ${key}`;
+    const meta = beginnerMoveCategory(key);
+    item.innerHTML = `<div class="review-summary-count-top"><span class="review-summary-count-number">${counts[key] || 0}</span><strong>${meta.title}</strong></div><p>${meta.help}</p>`;
+    container.appendChild(item);
+  });
+}
+
+function beginnerMoveCategory(key) {
+  return {
+    brilliant: { title:'Exceptional ideas', help:'Creative, difficult moves that worked extremely well.' },
+    great: { title:'Great finds', help:'Important moves that solved a problem or created a strong threat.' },
+    best: { title:'Best choices', help:'Moves that matched the strongest option found by the review.' },
+    excellent: { title:'Very strong moves', help:'Moves that kept nearly all of your position’s strength.' },
+    good: { title:'Good moves', help:'Solid choices that worked, even if something slightly better existed.' },
+    book: { title:'Sound opening moves', help:'Normal, well-established opening ideas.' },
+    inaccuracy: { title:'Small slips', help:'Minor mistakes that gave away a little of your advantage.' },
+    mistake: { title:'Mistakes', help:'Moves that noticeably made your position worse.' },
+    miss: { title:'Missed chances', help:'Moments where a stronger tactical opportunity was available.' },
+    blunder: { title:'Major mistakes', help:'Moves that caused a large swing in the position.' },
+  }[key] || { title:'Reviewed moves', help:'Moves reviewed by Blurple.' };
+}
+
+function buildBeginnerTakeaway(playerBucket) {
+  const positives = playerBucket.counts.brilliant + playerBucket.counts.great + playerBucket.counts.best + playerBucket.counts.excellent;
+  const learning = playerBucket.counts.inaccuracy + playerBucket.counts.mistake + playerBucket.counts.miss + playerBucket.counts.blunder;
+  if (learning === 0) return `You played a very clean game with ${positives} strong or near-best decisions and no major learning flags. Keep focusing on converting good positions calmly.`;
+  if (playerBucket.counts.blunder > 0) return `Your biggest opportunity is avoiding major mistakes. Before each move, check: “What can my opponent capture, check, or threaten next?” That single habit can improve your results quickly.`;
+  if (playerBucket.counts.mistake > 1) return `Your game was competitive, but a few decisions changed the position sharply. Slow down on critical turns and compare at least two candidate moves before committing.`;
+  return `Most of your play was stable. The next step is turning small slips and missed chances into stronger decisions by checking forcing moves — checks, captures, and threats — before every move.`;
 }
 
 function renderReviewBoard(item) {
@@ -1467,15 +1617,25 @@ function renderReviewBoard(item) {
   const [x2, y2] = squareCenterPercent(item.to);
   const dx = x2 - x1, dy = y2 - y1;
   const len = Math.max(0.001, Math.hypot(dx, dy));
-  const trimStart = 2.2, trimEnd = 4.2;
-  const sx = x1 + dx / len * trimStart;
-  const sy = y1 + dy / len * trimStart;
-  const ex = x2 - dx / len * trimEnd;
-  const ey = y2 - dy / len * trimEnd;
   const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.setAttribute('class','review-arrow-overlay');
+  svg.setAttribute('class','review-arrow-overlay review-dot-path');
   svg.setAttribute('viewBox','0 0 100 100');
-  svg.innerHTML = `<defs><marker id="reviewArrowHead" markerWidth="7" markerHeight="7" refX="5.7" refY="3.5" orient="auto" markerUnits="strokeWidth"><path class="review-arrow-head" d="M0,0 L7,3.5 L0,7 Z"/></marker></defs><line class="review-arrow-line" x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" marker-end="url(#reviewArrowHead)"/>`;
+  const dotCount = Math.max(3, Math.min(7, Math.round(len / 8)));
+  let dots = '';
+  for (let i = 1; i <= dotCount; i++) {
+    const t = i / (dotCount + 1);
+    const cx = x1 + dx * t;
+    const cy = y1 + dy * t;
+    dots += `<circle class="review-move-dot" cx="${cx}" cy="${cy}" r="1.15"/>`;
+  }
+  const ux = dx / len, uy = dy / len;
+  const endX = x2 - ux * 2.8, endY = y2 - uy * 2.8;
+  const perpX = -uy, perpY = ux;
+  const backX = endX - ux * 3.2, backY = endY - uy * 3.2;
+  const p1 = `${endX},${endY}`;
+  const p2 = `${backX + perpX * 1.8},${backY + perpY * 1.8}`;
+  const p3 = `${backX - perpX * 1.8},${backY - perpY * 1.8}`;
+  svg.innerHTML = `${dots}<polygon class="review-arrow-head-small" points="${p1} ${p2} ${p3}"/>`;
   board.appendChild(svg);
 }
 
